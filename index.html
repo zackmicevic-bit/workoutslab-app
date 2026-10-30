@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workoutslab Elite - ST.22 Universe</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#06080d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Workoutslab">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+    body {
+      background-color: #06080d;
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .universe-dashboard {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: radial-gradient(circle at top right, #161b26 0%, #0d111a 100%);
+      border: 3px solid #d4af37;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(212, 175, 55, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .universe-dashboard::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 35%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .universe-header {
+      background: rgba(13, 17, 26, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 14px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .header-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .universe-badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .pwa-install-pill {
+      background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+      color: #06080d;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .universe-title {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+      letter-spacing: 0.03em;
+    }
+
+    .universe-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 0 0 20px 0;
+    }
+
+    .pill-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #1f293d 0%, #111827 100%);
+      border: 1.5px solid #d4af37;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .pill-arrow {
+      background: #d4af37;
+      color: #06080d;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .universe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .universe-card {
+      background: rgba(13, 17, 26, 0.75);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.08);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .universe-card:hover {
+      border-color: #d4af37;
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2), inset 0 1px 2px rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .day-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #d4af37;
+      font-weight: 700;
+    }
+
+    .gold-text { color: #ffd700; }
+
+    .expand-icon {
+      font-size: 16px;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.1);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .universe-card h2 {
+      font-size: 15px;
+      color: #fff;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+
+    .mini-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preview-pill {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .notes-snippet {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="universe-dashboard">
+  <header class="universe-header">
+    <div class="header-top-row">
+      <div class="universe-badge">Workoutslab · ST.22 System</div>
+      <button id="pwaInstallBtn" class="pwa-install-pill" style="display: none;">
+        📲 Install App
+      </button>
+    </div>
+    
+    <h1 class="universe-title">Workoutslab Strength Universe</h1>
+    <p class="universe-subtitle">4 Days / Week · Alternating Intensities & Offline Gym Ready</p>
+    
+    <div class="action-bar">
+      <button class="pill-btn primary-glow" onclick="window.open('https://www.youtube.com', '_blank')">
+        <span class="btn-text">View HOW TO Videos (YouTube / TikTok)</span>
+        <span class="pill-arrow">›</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="universe-grid">
+    <div class="universe-card">
+      <div class="card-top"><span class="day-tag">Day 01 · High Intensity</span><span class="expand-icon">›</span></div>
+      <h2>Shoulders, Triceps, Hams & Calves</h2>
+      <div class="mini-preview"><div class="preview-pill">Barbell Shoulder Press (Front/Back)</div><div class="preview-pill">Triceps Close-Grip Dips</div></div>
+    </div>
+    <div class="universe-card">
+      <div class="card-top"><span class="day-tag">Day 02 · Light Intensity</span><span class="expand-icon">›</span></div>
+      <h2>Back & Rear Shoulders</h2>
+      <div class="mini-preview"><div class="preview-pill">Lat Pull-Ups (Weighted / Bodyweight)</div><div class="preview-pill">Bent-Over One-Arm Dumbbell Row</div></div>
+    </div>
+    <div class="universe-card">
+      <div class="card-top"><span class="day-tag">Day 03 · High Intensity</span><span class="expand-icon">›</span></div>
+      <h2>Chest & Biceps</h2>
+      <div class="mini-preview"><div class="preview-pill">Inclined Barbell Bench Press</div><div class="preview-pill">Preacher Curls & Weighted Chins</div></div>
+    </div>
+    <div class="universe-card">
+      <div class="card-top"><span class="day-tag">Day 04 · Medium Intensity</span><span class="expand-icon">›</span></div>
+      <h2>Quads, Shoulder & Abs</h2>
+      <div class="mini-preview"><div class="preview-pill">Squats & Jump Squats</div><div class="preview-pill">Weighted Hanging Leg Raises</div></div>
+    </div>
+    <div class="universe-card notes-card">
+      <div class="card-top"><span class="day-tag gold-text">Workoutslab Storage</span><span class="expand-icon">✓</span></div>
+      <h2>Offline Sync Active</h2>
+      <p class="notes-snippet">Workouts and custom notes sync directly with your device's local memory for seamless offline access at the gym.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  let deferredPWAEvent;
+  const installBtn = document.getElementById('pwaInstallBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPWAEvent = e;
+    installBtn.style.display = 'block';
+
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none';
+      deferredPWAEvent.prompt();
+      deferredPWAEvent.userChoice.then(() => { deferredPWAEvent = null; });
+    });
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Workoutslab ServiceWorker active.'))
+        .catch((err) => console.log('SW failed:', err));
+    });
+  }
+</script>
+</body>
+</html>
