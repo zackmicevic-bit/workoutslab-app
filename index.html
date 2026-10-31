@@ -791,6 +791,16 @@
       paramKey = (urlParams.get('license_key') || urlParams.get('key') || '').trim();
     } catch (e) { paramKey = ''; }
 
+    // DEV-ONLY (remove before launch): ?dev=1 stores a dev flag on this
+    // device. With the flag set, the dummy key WORKOUTSLAB-DEMO unlocks
+    // locally for testing. Without the flag the dummy key falls through
+    // to real Lemon Squeezy validation like any other key.
+    try {
+      if (new URLSearchParams(window.location.search).get('dev') === '1') {
+        localStorage.setItem('workoutslab_dev', '1');
+      }
+    } catch (e) {}
+
     if (paramKey) {
       try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
       document.getElementById('subscriptionModal').style.display = 'flex';
@@ -810,6 +820,18 @@
     if (!key) {
       statusEl.style.color = '#ef4444';
       statusEl.innerText = 'Please enter a valid license key.';
+      return;
+    }
+
+    // DEV-ONLY DUMMY KEY (remove before launch — see DOMContentLoaded note).
+    if (localStorage.getItem('workoutslab_dev') === '1' && key === 'WORKOUTSLAB-DEMO') {
+      localStorage.setItem('workoutslab_sub_active', 'true');
+      localStorage.setItem('workoutslab_license_key', key);
+      statusEl.style.color = '#10b981';
+      statusEl.innerText = 'Demo unlock active — dev mode.';
+      setTimeout(() => {
+        document.getElementById('subscriptionModal').style.display = 'none';
+      }, 1200);
       return;
     }
 
