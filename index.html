@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Workoutslab Elite - Workout Vault</title>
   
   <!-- PWA Manifest & Theme -->
@@ -22,6 +22,15 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Legibility safeguards: JS sets the root size per screen width (all
+       rem type scales with it); text-size-adjust stops Mobile Safari from
+       unpredictably inflating or shrinking small text. */
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     body {
@@ -57,7 +66,7 @@
 
     .brand-badge {
       display: inline-block;
-      font-size: 10px;
+      font-size: 0.625rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
       color: #d4af37;
@@ -78,7 +87,7 @@
     }
 
     .brand-subtitle {
-      font-size: 12px;
+      font-size: 0.75rem;
       color: #94a3b8;
       margin: 0;
     }
@@ -90,11 +99,14 @@
       padding: 6px 12px;
       border-radius: 20px;
       font-weight: 700;
-      font-size: 10px;
+      font-size: 0.625rem;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      min-height: 44px; /* safeguard: full touch target */
+      display: inline-flex;
+      align-items: center;
     }
 
     /* Common Glass Overlay — streak direction follows the tile's --sheen
@@ -125,28 +137,31 @@
     .bento-grid .lux-tile:nth-child(7) { --sheen: 298deg; --sx: 14%; --sy: 82%; }
     .bento-grid .lux-tile:nth-child(8) { --sheen: 344deg; --sx: 10%; --sy: 40%; }
 
-    /* 2-Column Bento Grid */
+    /* 1-Column Horizontal Tile List (full-width rows, stacked) */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
-    /* Individual Bento Tiles */
+    /* Individual Bento Tiles — full-width horizontal bars: title + badge
+       share one head line (badge wraps under on the narrowest screens),
+       description runs full-width below. */
     .bento-tile {
       position: relative;
       background: rgba(13, 17, 26, 0.85);
       border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 14px;
-      padding: 16px;
+      padding: 14px 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      min-height: 115px;
+      justify-content: center;
+      gap: 2px;
+      min-height: 78px;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
     }
 
     .bento-tile:active {
@@ -160,7 +175,18 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      margin-bottom: 10px;
+      row-gap: 6px;
+      flex-wrap: wrap; /* badge unit drops under the title on the narrowest screens */
+      margin-bottom: 4px;
+    }
+
+    /* Badge + chevron travel as one unit — they wrap below the title
+       together, never leaving a lone chevron on its own line. */
+    .tile-go {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
     }
 
     .tile-badge {
@@ -207,6 +233,9 @@
       line-height: 1.25;
       letter-spacing: -0.01em;
       text-transform: uppercase;
+      flex: 1 1 auto; /* title takes the head line, badge + chevron dock right */
+      min-width: 0;
+      text-align: left;
       /* Luminous etched core, same stack as the workout-card titles */
       color: #f3e0aa;
       text-shadow:
@@ -229,33 +258,27 @@
       margin: 0;
     }
 
-    /* Cover tiles: same leather + type system as the workout cards (grain,
-       sheen, glass blur, deep drop + glass insets, crisp type). Rim stays
-       the thin 1.5px brass bevel — the 5px card rim is too heavy at tile
-       scale — and the gold press aura stays as the tile tactile feel.
-       SHEEN: each tile face catches the light from its own direction —
-       --sheen steers the glass-overlay streak, --sx/--sy move the soft
-       radial hotspot, so no two tiles share the same sheen angle. */
+    /* Cover tiles: black-obsidian face with gold-vein texture (Universe
+       Lux spec) + the per-tile randomized sheen system: --sheen steers the
+       glass-overlay streak, --sx/--sy move the gold hotspot, so no two
+       tiles share the same sheen angle. Chrome rim; tactile press kept. */
     .lux-tile {
       --sheen: 135deg; /* per-tile override below */
       --sx: 30%;
       --sy: 20%;
       font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-      background-color: #0c0b0a;
+      background-color: #0a0a0c;
       background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"),
-        radial-gradient(circle at var(--sx) var(--sy), rgba(255, 255, 255, 0.04) 0%, transparent 60%),
-        linear-gradient(145deg, #181716 0%, #0d0c0b 100%);
-      -webkit-backdrop-filter: blur(14px);
-      backdrop-filter: blur(14px);
+        radial-gradient(circle at var(--sx) var(--sy), rgba(196, 152, 56, 0.10) 0%, transparent 45%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='obsidianVeinTile'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='3' result='noise'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 0.8 0 0 0  0 0.5 0 0 0  0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23obsidianVeinTile)'/%3E%3C/svg%3E"),
+        linear-gradient(145deg, #141417 0%, #0a0a0c 100%);
       border: none; /* rim comes from the ::before gradient mask */
       border-radius: 20px;
       box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.85),
-        inset 0 1px 1px rgba(255, 255, 255, 0.08), /* Upper glass sheen */
-        inset 0 -1px 2px rgba(0, 0, 0, 0.7);      /* Lower material shadow */
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                  box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        0 20px 40px rgba(0, 0, 0, 0.8),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1),
+                  box-shadow 0.15s cubic-bezier(0.2, 0, 0.2, 1);
       cursor: pointer;
       -webkit-tap-highlight-color: transparent; /* Removes mobile grey tap box */
 
@@ -265,20 +288,23 @@
       text-rendering: optimizeLegibility;
     }
 
-    /* Thin antique-brass bevel rim (same muted bronze as the cards). */
+    /* Gentle hover lift (fine-pointer devices only — touch keeps press). */
+    @media (hover: hover) and (pointer: fine) {
+      .lux-tile:hover { transform: translateY(-3px); }
+    }
+
+    /* Chrome bevel rim (Universe Lux spec). */
     .lux-tile::before {
       content: '';
       position: absolute;
       inset: 0;
       border-radius: 20px;
-      padding: 1.5px; /* Gold bevel thickness */
+      padding: 1.5px;
       background: linear-gradient(
         135deg,
-        #d6c096 0%,
-        #a78e57 30%,
-        #453719 50%,
-        #8f7748 70%,
-        #c9b78e 100%
+        #4a4c52 0%,
+        #1e1f24 50%,
+        #787a82 100%
       );
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -322,104 +348,88 @@
     <div class="bento-tile lux-tile" onclick="openCategory('bodybuilding')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge" id="bodyTileBadge">12 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Bodybuilding</h3>
-        <p class="tile-desc">Hypertrophy & Isolation</p>
+        <span class="tile-go"><span class="tile-badge" id="bodyTileBadge">12 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Hypertrophy & Isolation</p>
     </div>
 
     <!-- Category 2 -->
     <div class="bento-tile lux-tile" onclick="openCategory('strength')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">8 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Strength Training</h3>
-        <p class="tile-desc">Progressive Overload</p>
+        <span class="tile-go"><span class="tile-badge">8 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Progressive Overload</p>
     </div>
 
     <!-- Category 3 -->
     <div class="bento-tile lux-tile" onclick="openCategory('powerlifting')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">6 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Powerlifting</h3>
-        <p class="tile-desc">SBD Peak Performance</p>
+        <span class="tile-go"><span class="tile-badge">6 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">SBD Peak Performance</p>
     </div>
 
     <!-- Category 4 -->
     <div class="bento-tile lux-tile" onclick="openCategory('fitness')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">10 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Fitness & Health</h3>
-        <p class="tile-desc">Athletic Vitality</p>
+        <span class="tile-go"><span class="tile-badge">10 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Athletic Vitality</p>
     </div>
 
     <!-- Category 5 -->
     <div class="bento-tile lux-tile" onclick="openCategory('fatloss')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">7 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Fat Loss & Shred</h3>
-        <p class="tile-desc">High Metabolic Output</p>
+        <span class="tile-go"><span class="tile-badge">7 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">High Metabolic Output</p>
     </div>
 
     <!-- Category 6 -->
     <div class="bento-tile lux-tile" onclick="openCategory('mobility')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">5 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Mobility & Rehab</h3>
-        <p class="tile-desc">Joint Health & Longevity</p>
+        <span class="tile-go"><span class="tile-badge">5 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Joint Health & Longevity</p>
     </div>
 
     <!-- Category 7 -->
     <div class="bento-tile lux-tile" onclick="openCategory('home')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge">9 Programs</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Home & Travel</h3>
-        <p class="tile-desc">Minimal Equipment</p>
+        <span class="tile-go"><span class="tile-badge">9 Programs</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Minimal Equipment</p>
     </div>
 
     <!-- Category 8 -->
     <div class="bento-tile lux-tile" onclick="openCategory('custom')">
       <div class="card-glass-overlay"></div>
       <div class="tile-top">
-        <span class="tile-badge gold-badge">Saved</span>
-        <span class="chevron">›</span>
-      </div>
-      <div>
         <h3>Focus Workouts</h3>
-        <p class="tile-desc">Personalized Routines</p>
+        <span class="tile-go"><span class="tile-badge gold-badge">Saved</span>
+        <span class="chevron">›</span></span>
       </div>
+      <p class="tile-desc">Personalized Routines</p>
     </div>
 
   </div>
@@ -427,6 +437,9 @@
 
 <!-- Sub-Page Detail View (SPA overlay for the 8 bento categories) -->
 <div id="categoryDetailView" class="category-detail-view" style="display: none;">
+
+  <!-- Random gym-photo backdrop (dimmed ghost behind the workout text) -->
+  <div class="vault-detail-photo" id="detailPhoto" aria-hidden="true"></div>
 
   <!-- Sub-Page Top Navigation Bar -->
   <div class="subpage-header">
@@ -449,10 +462,14 @@
 </div>
 <!-- SUBSCRIPTION / LICENSE KEY MODAL (Lemon Squeezy, static-site gate: validate once online, cached flag unlocks offline gym use) -->
 <div id="subscriptionModal" class="sub-modal" style="display: none;">
-  <div class="sub-modal-content lux-leather-card alcantara-face">
-    <div class="brand-badge">WORKOUTSLAB MEMBERSHIP</div>
+  <div class="sub-modal-content lux-leather-card obsidian-sub">
+    <div class="vault-photo sub-photo" id="subPhoto" aria-hidden="true"></div>
+    <div class="sub-stitching"></div>
+    <div class="sub-header">
+      <div class="brand-badge">WORKOUTSLAB MEMBERSHIP</div>
+    </div>
     <h2>Activate Subscription</h2>
-    <p>Enter your Lemon Squeezy license key to unlock your $5/month Vault access.</p>
+    <p>Enter your license key to unlock access.</p>
 
     <div class="input-group">
       <input type="text" id="licenseKeyInput" placeholder="Enter License Key (e.g., XXXXXXXX-XXXX-...)" autocomplete="off">
@@ -483,15 +500,18 @@
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+    overflow-y: auto; /* tall obsidian card scrolls on short screens */
   }
 
   .sub-modal-content {
     background: radial-gradient(circle at top right, #1a2233 0%, #0d111a 100%);
     border: 1.5px solid #d4af37;
     border-radius: 18px;
+    position: relative; /* anchors the pooled-photo backdrop layer */
     padding: 24px;
     max-width: 400px;
     width: 100%;
+    margin: auto; /* centers in the scrolling modal without clipping */
     box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(212, 175, 55, 0.1);
     text-align: center;
   }
@@ -523,7 +543,7 @@
     border-radius: 10px;
     padding: 12px 14px;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 16px; /* safeguard: below 16px iOS Safari zooms the page on focus */
     outline: none;
     text-align: center;
   }
@@ -534,17 +554,17 @@
   }
 
   .input-group button {
-    background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
-    color: #06080d;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #2a251e 0%, #15120e 100%);
+    color: #f7e7c4;
+    border: 1px solid #d4af37;
+    padding: 14px;
+    border-radius: 12px;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 0.8125rem;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    letter-spacing: 0.12em;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 230, 160, 0.4);
   }
 
   .input-group button:disabled {
@@ -553,7 +573,7 @@
   }
 
   .status-msg {
-    font-size: 11px;
+    font-size: 0.6875rem;
     min-height: 16px;
     margin-bottom: 10px !important;
   }
@@ -565,7 +585,7 @@
   }
 
   .buy-link {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: #d4af37;
     text-decoration: none;
     font-weight: 600;
@@ -613,8 +633,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
 
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Perimeter Double Stitching Effect (matches the workout cards) */
@@ -710,56 +730,82 @@
   .sub-modal-content.lux-leather-card { border: none; }
   .sub-modal-content.lux-leather-card:active { transform: none; }
 
-  /* Alcantara face for the Activate Subscription card (owner spec): matte
-     charcoal microsuede instead of the leather base — fine-grain noise
-     (baseFrequency 0.85 = dense micro-fibers; lower = coarser, higher =
-     finer), 0.18 texture visibility, 160deg charcoal falloff for the
-     light-absorbing matte effect. One adaptation: the spec's fixed 520px
-     height is a min-height here, so the form (input + button + footer)
-     can never clip on short screens. Brass rim + double stitching kept;
-     the nap sheen merges into the same ::after that draws the stitching.
-     backdrop blur dropped — the face is opaque and matte. */
-  .sub-modal-content.lux-leather-card.alcantara-face {
+  /* Subscription card: black-obsidian face (Universe Lux sub-card spec).
+     Leather base/rim/stitching underneath are fully overridden — the
+     ::after double-stitch is killed (the .sub-stitching div draws the
+     spec's single dashed inlay instead). */
+  .sub-modal-content.lux-leather-card.obsidian-sub {
     max-width: 380px;
-    min-height: 480px;
-    border-radius: 20px;
-    background-color: #1a1a1c;
+    padding: 32px;
+    border-radius: 28px;
+    background-color: #0a0a0c;
     background-image:
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='alcantaraSuede'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23alcantaraSuede)' opacity='0.18'/%3E%3C/svg%3E"),
-      radial-gradient(ellipse at 35% 25%, rgba(255, 255, 255, 0.07) 0%, transparent 60%),
-      linear-gradient(160deg, #242427 0%, #171719 50%, #0e0e0f 100%);
+      radial-gradient(ellipse at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='obsidianVein'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' result='noise'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 0.8 0 0 0  0 0.5 0 0 0  0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23obsidianVein)'/%3E%3C/svg%3E"),
+      linear-gradient(145deg, #161619 0%, #0d0d0f 50%, #050506 100%);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow:
-      inset 0 2px 4px rgba(255, 255, 255, 0.05),
-      inset 0 -8px 20px rgba(0, 0, 0, 0.8),
-      0 12px 32px rgba(0, 0, 0, 0.6);
+      0 35px 80px rgba(0, 0, 0, 0.95),
+      inset 0 1px 2px rgba(255, 255, 255, 0.15);
   }
-  .sub-modal-content.lux-leather-card.alcantara-face::before {
-    border-radius: 20px;
+  .sub-modal-content.lux-leather-card.obsidian-sub::before {
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(
+      135deg,
+      #4a4c52 0%,
+      #1e1f24 25%,
+      #0a0a0c 50%,
+      #3a3c42 75%,
+      #787a82 100%
+    );
   }
-  .sub-modal-content.lux-leather-card.alcantara-face::after {
-    border-radius: 12px;
-    background: radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+  .sub-modal-content.lux-leather-card.obsidian-sub::after {
+    content: none; /* leather stitch retired — .sub-stitching draws the spec inlay */
+  }
+  .sub-stitching {
+    position: absolute;
+    inset: 12px;
+    border-radius: 18px;
+    border: 1.5px dashed #d4af37;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    row-gap: 10px;
+    flex-wrap: wrap; /* status drops below the badge on narrow phones */
+    margin-bottom: 24px;
+  }
+  .sub-modal-content .brand-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #f7e7c4;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2a251e 0%, #15120e 100%);
+    border: 1px solid #8c6f3d;
+    box-shadow: inset 0 1px 1px rgba(255, 230, 160, 0.3);
+    text-shadow: none;
   }
   .sub-modal-content h2 {
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     text-transform: uppercase;
-    /* Luminous etched core, same stack as the workout-card titles */
-    color: #f3e0aa;
-    text-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.95),
-      0 0 4px rgba(0, 0, 0, 0.9),
-      0 0 8px rgba(243, 224, 170, 0.35),
-      0 -1px 1px rgba(255, 240, 200, 0.4);
-  }
-  .sub-modal-content .brand-badge {
-    color: #e2e2e5; /* warm off-white secondary text (gold kept for titles) */
-    background: transparent;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 -1px 1px rgba(255, 220, 140, 0.3);
+    margin: 0 0 16px 0;
+    background: linear-gradient(180deg, #ffffff 0%, #f7e2a3 30%, #c49838 80%, #8c631d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
   .sub-modal-content > p {
     color: #e9e3d5;
@@ -768,8 +814,32 @@
 </style>
 
 <script>
+  // Viewport safeguards: auto-detect screen size and optimize legibility.
+  // Phones get a larger root font (all rem-based type scales up with it),
+  // a data-vp tier hook for CSS (xs/sm/md/lg), and short screens get a
+  // compact-spacing hook (vp-short). Re-runs on rotation/resize.
+  function applyViewportSafeguards() {
+    try {
+      var w = window.innerWidth || 390, h = window.innerHeight || 700;
+      var root = document.documentElement;
+      root.dataset.vp = w <= 360 ? 'xs' : w <= 430 ? 'sm' : w <= 768 ? 'md' : 'lg';
+      root.classList.toggle('vp-short', h <= 640);
+      var base = w <= 320 ? 17 : w <= 430 ? 18 : w <= 768 ? 17 : 16;
+      root.style.fontSize = base + 'px';
+      root.style.setProperty('--uiscale', (base / 16).toFixed(3));
+    } catch (e) {}
+  }
+  (function () {
+    applyViewportSafeguards();
+    var t = null;
+    function debounced() { if (t) clearTimeout(t); t = setTimeout(applyViewportSafeguards, 150); }
+    window.addEventListener('resize', debounced);
+    window.addEventListener('orientationchange', debounced);
+  })();
+
   // Check subscription status on boot
   window.addEventListener('DOMContentLoaded', () => {
+    applyViewportSafeguards();
     // Preview mockups (generator page only): window.__vaultPreview forces a
     // variant per phone — 'activate' shows the modal, 'tiles' skips it.
     // Undefined in production, so the deployed PWA is unaffected.
@@ -946,7 +1016,18 @@
     overflow-y: auto;
     padding: 20px 16px;
     box-sizing: border-box;
-    animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Random gym-photo backdrop: one dimmed photo per detail open, behind
+     all workout text (never on the cover tiles). Content lifts above it. */
+  .vault-detail-photo {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    z-index: -1;
   }
 
   @keyframes slideUp {
@@ -960,7 +1041,7 @@
     to { opacity: 1; transform: none; }
   }
   .program-list.lux-enter > * {
-    animation: luxRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: luxRise 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   /* Subpage Navigation Bar */
@@ -980,11 +1061,13 @@
     color: #d4af37;
     padding: 8px 16px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-height: 44px; /* safeguard: full touch target */
     gap: 6px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -996,7 +1079,7 @@
   }
 
   .subpage-badge {
-    font-size: 10px;
+    font-size: 0.625rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: #94a3b8;
@@ -1014,14 +1097,14 @@
 
   .subpage-title {
     font-family: 'Cinzel', serif;
-    font-size: 26px;
+    font-size: 28.6px;
     color: #ffffff;
     margin: 0 0 6px 0;
     text-transform: uppercase;
   }
 
   .subpage-subtitle {
-    font-size: 13px;
+    font-size: 0.894rem;
     color: #94a3b8;
     margin: 0 0 24px 0;
     text-transform: uppercase;
@@ -1041,7 +1124,7 @@
     padding: 18px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.4);
     cursor: pointer;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.1s ease;
   }
 
   .program-card:active {
@@ -1049,21 +1132,21 @@
   }
 
   .program-card h4 {
-    font-size: 15px;
+    font-size: 1.031rem;
     color: #ffffff;
     margin: 0 0 6px 0;
     text-transform: uppercase;
   }
 
   .program-card p {
-    font-size: 11px;
+    font-size: 0.756rem;
     color: #94a3b8;
     margin: 0 0 10px 0;
   }
 
   .program-tag {
     display: inline-block;
-    font-size: 9px;
+    font-size: 0.619rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #d4af37;
@@ -1078,7 +1161,7 @@
   /* Days-per-week info tag: sits under the workout name on list cards. */
   .program-days {
     display: inline-block;
-    font-size: 9px;
+    font-size: 0.619rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #d4af37;
@@ -1094,7 +1177,7 @@
      Day + workout names always render in capitals (display-level only). */
   .vault-day {
     display: block;
-    font-size: 11px;
+    font-size: 0.756rem;
     color: #94a3b8;
     line-height: 1.5;
     text-transform: uppercase;
@@ -1121,9 +1204,9 @@
     flex: 0 0 auto;
     color: #d4af37;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14.3px;
     line-height: 1.8;
-    transition: transform 0.15s ease;
+    transition: transform 0.1s ease;
   }
   .program-card.open .vault-chev { transform: rotate(90deg); }
   .vault-cbody[hidden] { display: none; }
@@ -1135,7 +1218,7 @@
     padding-top: 10px;
   }
   .vault-innote-head {
-    font-size: 9px;
+    font-size: 0.619rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: #d4af37;
@@ -1146,12 +1229,13 @@
   .vault-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* fixed geometry: Sets/Reps align across all detail tables */
     margin: 10px 0 14px;
-    font-size: 11px;
+    font-size: 0.756rem;
   }
 
   .vault-table th {
-    font-size: 9px;
+    font-size: 0.619rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #d4af37;
@@ -1164,6 +1248,7 @@
     padding: 7px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     color: #e2e8f0;
+    overflow-wrap: break-word;
   }
 
   .vault-table tr.vault-super td:first-child {
@@ -1180,10 +1265,15 @@
     border: 1px solid rgba(212, 175, 55, 0.4);
     border-radius: 10px;
     color: #e2e8f0;
-    font-size: 12px;
+    font-size: 16px; /* safeguard: below 16px iOS Safari zooms the page on focus */
     padding: 10px 12px;
     outline: none;
+    min-height: 44px; /* safeguard: full touch target */
   }
+
+  /* Short-height safeguard: tighten vertical rhythm so content fits. */
+  .vp-short .lux-workout-card { padding-top: 20px; padding-bottom: 20px; }
+  .vp-short .sub-modal-content.lux-leather-card.obsidian-sub { padding: 24px; }
 </style>
 
 <!-- LUX WORKOUT CARDS (Bodybuilding list): brushed-obsidian + polished gold bevel -->
@@ -1196,33 +1286,28 @@
     position: relative;
     width: 100%;
     max-width: 380px; /* Adjust as needed */
-    padding: 24px;
-    border-radius: 20px;
+    padding: 28px 44px 28px 24px; /* right clearance for the mechanical slider */
+    border-radius: 24px;
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
     overflow: hidden; /* Clips the internal details */
 
-    /* Semi-Opaque Brushed Obsidian/Leather Background */
-    background-color: #0c0b0a;
+    /* Black obsidian face (Universe Lux spec): twin sheens + gold vein */
+    background-color: #0a0a0c;
     background-image:
-      /* Subtly textured overlay for leather grain simulation */
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"),
-      /* Soft lighting sheen */
-      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
-      linear-gradient(145deg, #181716 0%, #0d0c0b 100%);
-
-    /* Glass Blur and Material Depth */
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+      radial-gradient(ellipse at 25% 15%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(196, 152, 56, 0.08) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='obsidianVein'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' result='noise'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 0.8 0 0 0  0 0.5 0 0 0  0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23obsidianVein)'/%3E%3C/svg%3E"),
+      linear-gradient(145deg, #161619 0%, #0d0d0f 45%, #050506 100%);
     box-shadow:
-      0 24px 60px rgba(0, 0, 0, 0.85),
-      inset 0 1px 1px rgba(255, 255, 255, 0.08), /* Upper glass sheen */
-      inset 0 -1px 2px rgba(0, 0, 0, 0.7);      /* Lower material shadow */
+      0 30px 70px rgba(0, 0, 0, 0.95),
+      inset 0 1px 2px rgba(255, 255, 255, 0.15),
+      inset 0 -8px 24px rgba(0, 0, 0, 0.9);
 
     cursor: pointer;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.15s ease,
+                box-shadow 0.15s ease;
 
     /* Crisp type on grain: antialiased raster + kerning/ligatures (kept) */
     -webkit-font-smoothing: antialiased;
@@ -1230,20 +1315,20 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Polished Metal Gold Bevel Rim (CSS Gradient Mask) */
+  /* Chrome bevel rim (Universe Lux spec) */
   .lux-workout-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 20px;
-    padding: 5px; /* Brass rim per reference: muted antique bronze, no vivid yellow */
+    border-radius: 24px;
+    padding: 2px;
     background: linear-gradient(
       135deg,
-      #d6c096 0%,
-      #a78e57 30%,
-      #453719 50%,
-      #8f7748 70%,
-      #c9b78e 100%
+      #4a4c52 0%,
+      #1e1f24 25%,
+      #0a0a0c 50%,
+      #3a3c42 75%,
+      #787a82 100%
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1252,26 +1337,66 @@
     pointer-events: none;
   }
 
-  /* Perimeter Double Stitching Effect: two prominent saddle-stitch rows
-     near the edge (thick luminous dashes per the reference plaque). */
+  /* Gold dashed inlay (Universe Lux spec: single stitched row). */
   .lux-workout-card::after {
     content: '';
     position: absolute;
     inset: 10px;
-    border-radius: 10px;
-    border: 2px dashed rgba(216, 182, 106, 0.65);
-    outline: 2px dashed rgba(216, 182, 106, 0.45);
-    outline-offset: 5px;
+    border-radius: 16px;
+    border: 1.5px dashed #d4af37;
+    opacity: 0.85;
     pointer-events: none;
   }
 
-  /* Haptic Press / Active Tap State (matte press, no aura) */
+  /* Haptic Press / Active Tap State */
   .lux-workout-card:active,
   .lux-workout-card.is-tapped {
-    transform: scale(0.97);
+    transform: scale(0.975);
     box-shadow:
       0 6px 16px rgba(0, 0, 0, 0.9),
       inset 0 3px 6px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Mechanical slider (Universe Lux spec, decorative intensity rail). */
+  .slider-track {
+    position: absolute;
+    right: 12px;
+    top: 12%;
+    width: 14px;
+    height: 76%;
+    background: #09090b;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95);
+    pointer-events: none;
+  }
+  .slider-rail {
+    position: absolute;
+    width: 3px;
+    height: calc(100% - 16px);
+    background: linear-gradient(to bottom, #fff5d1 0%, #a88232 50%, #3b2a09 100%);
+    border-radius: 2px;
+  }
+  .slider-handle {
+    position: absolute;
+    width: 12px;
+    height: 64px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #4a3e28 0%, #1c170e 100%);
+    border: 1px solid #d4af37;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 235, 170, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .handle-pin {
+    width: 4px;
+    height: 10px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #ffffff 0%, #d4af37 100%);
   }
 
   /* --- Badges & Tags --- */
@@ -1281,40 +1406,31 @@
     margin-bottom: 14px;
   }
 
-  /* Base Brass Badge Style: recessed aged-brass plate, bevel trim,
-     debossed stamped text (owner spec, verbatim). */
+  /* Level plate (Universe Lux spec): dark recessed plate, gold text.
+     Pure info badge — no action, no chevron. */
   .lux-brass-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     padding: 6px 14px;
     border-radius: 8px;
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.792rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-
-    /* Metallic Aged Brass Gradient Base */
-    background: linear-gradient(
-      145deg,
-      #3d3119 0%,
-      #251d0e 45%,
-      #181208 100%
-    );
-
-    /* Recessed Physical Plate Effect (Shadows & Bevel Rim) */
+    color: #f7e7c4;
+    background: linear-gradient(135deg, #2a251e 0%, #15120e 100%);
+    border: 1px solid #8c6f3d;
     box-shadow:
-      0 4px 10px rgba(0, 0, 0, 0.8),             /* Drop shadow onto leather */
-      inset 0 1px 1px rgba(235, 195, 115, 0.35),  /* Top inner highlight catch-light */
-      inset 0 -1px 2px rgba(0, 0, 0, 0.9);        /* Bottom inner shadow line */
-
-    border: 1px solid rgba(184, 145, 60, 0.4);
+      0 4px 10px rgba(0, 0, 0, 0.6),
+      inset 0 1px 1px rgba(255, 230, 160, 0.3);
     position: relative;
     box-sizing: border-box;
+    cursor: default; /* info-only: never looks clickable */
   }
 
-  /* Metallic Edge Bevel Trim */
+  /* Plate edge trim (kept, retinted to the dark plate). */
   .lux-brass-badge::before {
     content: '';
     position: absolute;
@@ -1323,10 +1439,9 @@
     padding: 1px;
     background: linear-gradient(
       135deg,
-      #d4af37 0%,
-      #6b531f 40%,
-      #2b200b 60%,
-      #a8852c 100%
+      #8c6f3d 0%,
+      #3a2f16 50%,
+      #d4af37 100%
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1335,79 +1450,89 @@
     pointer-events: none;
   }
 
-  /* Debossed / Laser-Stamped Brass Text */
+  /* Stamped plate text */
   .lux-brass-badge .badge-text {
-    color: #c9a449;
-    /* Deep stamped-in inner shadow effect */
-    text-shadow:
-      0 1px 1px rgba(0, 0, 0, 0.9),
-      0 -1px 0 rgba(255, 215, 130, 0.2);
+    color: #f7e7c4;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.9);
   }
 
-  /* Optional Chevron / Arrow Indicator inside badge */
-  .lux-brass-badge .badge-arrow {
-    color: #dfb854;
-    font-size: 0.8rem;
-    font-weight: 800;
-    line-height: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  /* Days pill: same plate treatment in pill geometry. Info-only as well. */
+  .lux-brass-badge.lux-brass-pill {
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 0.748rem;
+    letter-spacing: 0.12em;
+    color: #e5c158;
+    background: rgba(20, 18, 14, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: none;
+    padding: 4px 12px;
+    cursor: default;
   }
+  .lux-brass-badge.lux-brass-pill::before { display: none; }
+  .lux-brass-badge.lux-brass-pill .badge-text { color: #e5c158; }
 
-  /* Days pill keeps its pill geometry on the same brass plate. */
-  .lux-brass-badge.lux-brass-pill { border-radius: 20px; margin-bottom: 16px; }
-  .lux-brass-badge.lux-brass-pill::before { border-radius: 20px; }
-
-  /* --- Luminous laser-branded card header: bright etched core + charred rim ---
-     Same treatment as the leather-scope rule above, kept at the card's
-     1.45rem display scale so the brighter core also stays larger. */
+  /* --- Gradient-foil card title (Universe Lux spec) --- */
   .lux-card-title {
-    font-size: 1.45rem;
+    font-size: 1.485rem;
     font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    line-height: 1.3;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
-    margin: 0 0 16px 0;
-
-    /* 1. Luminous Gold Core (Significantly brighter) */
-    color: #f3e0aa;
-
-    /* 2. Enhanced Etched / Charred Text-Shadow Stack */
-    text-shadow:
-      /* Deep recessed stamping shadow (pushes letters "in") */
-      0 1px 2px rgba(0, 0, 0, 0.95),
-
-      /* Dark smoky charred carbon rim around the edges */
-      0 0 4px rgba(0, 0, 0, 0.9),
-
-      /* Warm inner glow/bloom making the stamped letters pop */
-      0 0 8px rgba(243, 224, 170, 0.35),
-
-      /* Top scorched rim highlight */
-      0 -1px 1px rgba(255, 240, 200, 0.4);
+    margin: 0 0 20px 0;
+    background: linear-gradient(180deg, #ffffff 0%, #f7e2a3 30%, #c49838 80%, #8c631d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
   .lux-card-schedule {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    margin-top: 24px;
   }
 
   .lux-schedule-item {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #e9e3d5;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    color: #d6be8a;
   }
 
   /* Built-in sample programs reuse the card: keep their one-line desc readable. */
   .lux-workout-card > p {
-    font-size: 11px;
+    font-size: 0.756rem;
     color: #94a3b8;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+
+  /* Random gym-photo backdrop: a dimmed ghost behind the card text, picked
+     fresh per card. Cover tiles never get one. Text + slider lift above. */
+  .vault-photo {
+    position: absolute;
+    inset: 3px; /* brass rim ring stays visible */
+    border-radius: 20px;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Cover-tile variant: one distinct pooled photo per tile, same ghost
+     treatment (rim + sheen stay visible, tile text always on top). */
+  .vault-photo.tile-photo {
+    inset: 2px;
+    border-radius: 18px;
+  }
+  /* Subscription-card variant: single pooled photo behind the form. */
+  .vault-photo.sub-photo {
+    inset: 0;
+    border-radius: 18px;
   }
 </style>
 
@@ -1435,6 +1560,12 @@
       badge: '12 Protocols Available',
       subtitle: 'Hypertrophy-focused isolation and volume routines.',
       programs: [
+        { name: 'Total Body Symmetry & Conditioning', desc: 'MB.20 · Full-Body Symmetry Protocol', tag: 'MB.20', level: 'beginner' },
+        { name: 'Hypertrophy Volume Matrix', desc: 'MB.21 · High-Volume Hypertrophy System', tag: 'MB.21', level: 'intermediate' },
+        { name: 'Advanced Mechanical Overload', desc: 'MB.22 · Mechanical Tension Overload', tag: 'MB.22', level: 'advanced' },
+        { name: 'Peak Strength & Powerlifting Protocol', desc: 'PL.21 · Strength & Powerlifting System', tag: 'PL.21', level: 'advanced' },
+        { name: 'Targeted Specialization & Mass Split', desc: 'MB.28 · Specialization Mass Split', tag: 'MB.28', level: 'intermediate' },
+        { name: 'Physique Sculpt & Density Split', desc: 'MB.29 · Sculpt & Density Protocol', tag: 'MB.29', level: 'intermediate' },
         { name: 'Hypertrophy Split', desc: '4-Day Alternating Shock Micro-Cycles', tag: 'Flagship', level: 'advanced' },
         { name: 'Golden Era Push/Pull/Legs', desc: 'Classic 6-Day High Volume Density', tag: 'Popular', level: 'intermediate' }
       ]
@@ -1521,7 +1652,7 @@
     localStorage.setItem('workoutslab_active_category', categoryId);
 
     // Display Subpage View
-    document.getElementById('categoryDetailView').style.display = 'block';
+    vaultShowDetail();
   }
 
   // Vault feed: staged workouts published from the generator's bulk section.
@@ -1529,6 +1660,42 @@
   // else the built-in samples). Tapping one renders its parsed tables.
   const VAULT_FEED_URL = 'https://editable.uploads.dev/file/my-workouts/workoutslab-vault-feed';
   let vaultCache = null, vaultCacheList = [];
+
+  // Random gym-photo backdrops (local compressed set in ./bg/). One dimmed
+  // photo sits behind each workout card's text and one behind each detail
+  // view; cover tiles never get one. Opacity stays low so text always wins.
+  const VAULT_BG = Array.from({length: 33}, (_, i) => './bg/bg-' + String(i + 1).padStart(2, '0') + '.jpg');
+  function vaultBgPick() { return VAULT_BG[(Math.random() * VAULT_BG.length) | 0]; }
+  // Every detail open gets a fresh random backdrop behind the workout text.
+  function vaultShowDetail() {
+    try {
+      document.getElementById('detailPhoto').style.backgroundImage = 'linear-gradient(rgba(6,8,13,0.88),rgba(6,8,13,0.88)),url(' + vaultBgPick() + ')';
+    } catch (e) {}
+    document.getElementById('categoryDetailView').style.display = 'block';
+  }
+
+  // Cover tiles + subscription card backdrops: each tile gets a distinct
+  // pooled photo (shuffled per load so all 8 differ), the Activate card
+  // gets one random photo. Same dimmed-veil ghost treatment as the cards.
+  function vaultPaintChrome() {
+    try {
+      const pool = VAULT_BG.slice();
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = (Math.random() * (i + 1)) | 0;
+        const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+      }
+      document.querySelectorAll('.bento-grid .lux-tile').forEach((tile, k) => {
+        const ph = document.createElement('div');
+        ph.className = 'vault-photo tile-photo';
+        ph.setAttribute('aria-hidden', 'true');
+        ph.style.backgroundImage = 'linear-gradient(rgba(10,10,12,0.84),rgba(10,10,12,0.84)),url(' + pool[k % pool.length] + ')';
+        tile.prepend(ph);
+      });
+      const sp = document.getElementById('subPhoto');
+      if (sp) sp.style.backgroundImage = 'linear-gradient(rgba(10,10,12,0.84),rgba(10,10,12,0.84)),url(' + vaultBgPick() + ')';
+    } catch (e) {}
+  }
+  window.addEventListener('DOMContentLoaded', vaultPaintChrome);
   async function vaultFeed() {
     try {
       const r = await fetch(VAULT_FEED_URL, { cache: 'no-store' });
@@ -1559,7 +1726,7 @@
     vaultCacheList = ((feed && feed.categories && feed.categories.bodybuilding) || []).filter(p => p && p.ed && p.ed.groups && p.ed.groups.length);
     renderVaultBodyList();
     localStorage.setItem('workoutslab_active_category', 'bodybuilding');
-    document.getElementById('categoryDetailView').style.display = 'block';
+    vaultShowDetail();
   }
   // Difficulty filter for the Bodybuilding list (Beginner/Intermediate/Advanced).
   let vaultLevelFilter = 'all';
@@ -1651,11 +1818,13 @@
       + '</select></div>';
     listContainer.innerHTML = filterHtml + (items.length ? items.map(x =>
       '<div class="lux-workout-card"' + (live ? ' onclick="openVaultWorkout(' + x.i + ')"' : '') + '>'
-      + '<div class="lux-badge-row"><span class="lux-brass-badge"><span class="badge-text">' + esc(vaultLevelLabel(x.p.level)) + '</span><span class="badge-arrow">›</span></span></div>'
+      + '<div class="vault-photo" aria-hidden="true" style="background-image:linear-gradient(rgba(10,10,12,0.84),rgba(10,10,12,0.84)),url(' + vaultBgPick() + ')"></div>'
+      + '<div class="lux-badge-row"><span class="lux-brass-badge" onclick="event.stopPropagation()"><span class="badge-text">' + esc(vaultLevelLabel(x.p.level)) + '</span></span></div>'
       + '<h3 class="lux-card-title">'
       + esc(live ? (x.p.rep || x.p.ed.title || x.p.name) : x.p.name) + '</h3>'
-      + (x.days ? '<span class="lux-brass-badge lux-brass-pill"><span class="badge-text">' + esc(x.days) + '</span></span>' : '')
-      + (live ? '<div class="lux-card-schedule">' + vaultDayNames(x.p).map(n => '<div class="lux-schedule-item">' + esc(n) + '</div>').join('') + '</div>' : '<p>' + esc(x.p.desc) + '</p>') + '</div>'
+      + (x.days ? '<span class="lux-brass-badge lux-brass-pill" onclick="event.stopPropagation()"><span class="badge-text">' + esc(x.days) + '</span></span>' : '')
+      + (live ? '<div class="lux-card-schedule">' + vaultDayNames(x.p).map(n => '<div class="lux-schedule-item">' + esc(n) + '</div>').join('') + '</div>' : '<p>' + esc(x.p.desc) + '</p>')
+      + '<div class="slider-track"><div class="slider-rail"></div><div class="slider-handle" style="top: ' + (15 + (x.i * 29) % 56) + '%;"><div class="handle-pin"></div></div></div>' + '</div>'
     ).join('') : '<div class="program-card"><p>No workouts at this level yet.</p></div>');
     replayListEnter(listContainer);
   }
@@ -1683,7 +1852,7 @@
       h += '<div class="program-card" onclick="vaultToggle(this, event)"><div class="vault-ghead"><span class="program-tag">' + esc(g.name || 'Group') + (gCount ? ' · ' + gCount + ' exercise' + (gCount === 1 ? '' : 's') : '') + '</span><span class="vault-chev">›</span></div><div class="vault-cbody">';
       (g.blocks || []).forEach(b => {
         if (b.name) h += '<h4>' + esc(b.name) + '</h4>';
-        h += '<table class="vault-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th></tr></thead><tbody>'
+        h += '<table class="vault-table"><colgroup><col><col style="width:52px"><col style="width:30%"></colgroup><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th></tr></thead><tbody>'
           + (b.rows || []).map(r => '<tr' + (r.super ? ' class="vault-super"' : '') + '><td>' + esc(r.name) + '</td><td>' + esc(r.sets == null || r.sets === '' ? '-' : r.sets) + '</td><td>' + esc(r.reps == null || r.reps === '' ? '-' : r.reps) + '</td></tr>').join('')
           + '</tbody></table>';
       });
@@ -1701,7 +1870,7 @@
     });
     document.getElementById('programList').innerHTML = h;
     replayListEnter(document.getElementById('programList'));
-    document.getElementById('categoryDetailView').style.display = 'block';
+    vaultShowDetail();
   }
 
   // Bodybuilding tile counter shows the LIVE vault protocol count (falls
